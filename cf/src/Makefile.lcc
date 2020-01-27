@@ -1,0 +1,235 @@
+MAKEFLAGS=-k -j 3
+FEOBJECTS=alloc.o \
+	bind.o \
+	dag.o \
+	decl.o \
+	enode.o \
+	error.o \
+	expr.o \
+	event.o \
+	init.o \
+	inits.o \
+	input.o \
+	lex.o \
+	list.o \
+	main.o \
+	output.o \
+	prof.o \
+	profio.o \
+	simp.o \
+	stmt.o \
+	string.o \
+	sym.o \
+	trace.o \
+	tree.o \
+	types.o \
+	null.o \
+	gen.o
+
+BEATOOBJS=\
+  ato_strengthreduce.o \
+  ato_loopinversion.o \
+  ato_constfold.o \
+  ato_inliner.o \
+  ato_removenops.o \
+  ato_codestraigthening.o \
+  ato_unreachablecode.o \
+  ato_ivelimination.o \
+  ato_ivstrengthreduction.o \
+  ato_inductionvars.o \
+  ato_gforwardsubst.o \
+  ato_lforwardsubst.o \
+  ato_jumpoptims.o \
+  ato_ifsimpls.o \
+  ato_gcse.o \
+  ato_lcse.o \
+  ato_bborder.o \
+  ato_remcasts.o \
+  ato_lower.o \
+  ato_callconv.o \
+  ato_deadcodeelim.o \
+  ato_loopinvariant.o \
+  ato_gcopyprop.o \
+  ato_lcopyprop.o \
+
+BEOBJECTS=\
+  arm_hwdef.o \
+  cgt_regalloc.o \
+  cgt_base.o \
+  options.o \
+  irs.o \
+  dfa.o \
+  anatrop.o \
+  extract.o \
+  predicates.o \
+  utils.o \
+  irbuilder.o \
+  irexprbuilder.o \
+  debugtrace.o \
+  lcc2hir.o \
+  stats.o \
+  debuginfo_dwarf.o \
+  hosttargettypes.o \
+  enums.o \
+  bcf_target.o \
+  cfa.o \
+  duud.o \
+  visitor.o \
+  ast2hir.o \
+  $(BEATOOBJS)
+
+# \todo adapt it to other platforms.
+PCHS=stlheaders.hh.gch
+
+OBJ_DIR=../obj
+EXE_DIR=../exe
+INC_DIR=../inc
+SRC_DIR=../src
+TOOLS_DIR=../tools
+LCCFLAGS=
+CPPFLAGS=-I../inc -I../../lcc/src -I../src/targets/arm -Wno-deprecated -frtti
+CFLAGS=-Dlist=tag_list -I../inc -I../../lcc/src $(LCCFLAGS)
+
+FELIB=felib.a
+
+CC=gcc
+CPPC=g++
+
+BUILDMODE=RELEASEBUILD
+BUILDMODE=DEBUGBUILD
+
+ifeq ($(BUILDMODE),DEBUGBUILD)
+$(info "Build mode is debug")
+exes:               CFLAGS   += -DRELEASEBUILD=0 -DDEBUGBUILD=1 -DINLINE__= -DSTATBUILD=1 -g
+exes:               CPPFLAGS += -DRELEASEBUILD=0 -DDEBUGBUILD=1 -DINLINE__= -DSTATBUILD=1 -g
+stlheaders.hh.gch:  CPPFLAGS += -DRELEASEBUILD=0 -DDEBUGBUILD=1 -DINLINE__= -DSTATBUILD=1 -g
+pch:                CPPFLAGS += -DRELEASEBUILD=0 -DDEBUGBUILD=1 -DINLINE__= -DSTATBUILD=1 -g
+else
+$(info "Build mode is release")
+exes:               CFLAGS   += -DRELEASEBUILD=1 -DDEBUGBUILD=0 -DINLINE__=inline -DSTATBUILD=1 -O3
+exes:               CPPFLAGS += -DRELEASEBUILD=1 -DDEBUGBUILD=0 -DINLINE__=inline -DSTATBUILD=1 -O3
+stlheaders.hh.gch:  CPPFLAGS += -DRELEASEBUILD=1 -DDEBUGBUILD=0 -DINLINE__=inline -DSTATBUILD=1 -O3
+pch:                CPPFLAGS += -DRELEASEBUILD=1 -DDEBUGBUILD=0 -DINLINE__=inline -DSTATBUILD=1 -O3
+endif
+
+.PHONY: all doc tags stat clean clobber srcs fesrcs besrcs exes pch
+VPATH=../obj:../inc:../src:../../lcc/src:../src/targets/arm:../tools
+
+%.o : %.cpp
+	@echo "Compiling $<:";\
+	$(CPPC) -include stlheaders.hh -c $(CPPFLAGS) $< -o $(OBJ_DIR)/$@;\
+	echo "Updating dependencies of $<:";\
+	$(CPPC) -include stlheaders.hh -c $(CPPFLAGS) -MM $< -o $(OBJ_DIR)/$*.d
+
+%.i : %.cpp
+	@echo "Compiling $<:";\
+	$(CPPC) -E -include stlheaders.hh -c $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
+
+%.o : %.c
+	@echo "Compiling $<:";\
+	$(CC) -c $(CFLAGS) $< -o $(OBJ_DIR)/$@;\
+	echo "Updating dependencies of $<:";\
+	$(CC) -c $(CFLAGS) -MM $< -o $(OBJ_DIR)/$*.d
+
+help:
+	@echo "     all: generates doc tags stat srcs exes"
+	@echo "     bin: generates srcs exes"
+	@echo "     doc: generates doxygen docs"
+	@echo "     srcs: generates fesrcs besrcs"
+	@echo "     exes: generates bcc"
+	@echo "     fesrcs: generates front-end related sources"
+	@echo "     besrcs: generates back-end related sources"
+	@echo "     pch: generates the precompiled header"
+	@echo "     tags: generates ctags tag files to be used with vi"
+	@echo "     stat: generates some statistics about the codes"
+	@echo "     clean: deletes all object files and libraries produced"
+	@echo "     clobber: does clear and also deletes executables"
+	@echo "     timings: outputs the timings"
+	@echo "     make also produces .d dependency files"
+
+stlheaders.hh.gch: stlheaders.hh
+	@echo "Compiling $<:";\
+	$(CPPC) -c $(CPPFLAGS) $< -o $(INC_DIR)/$@
+
+pch:
+	@echo "Compiling stlheaders.hh:";\
+	$(CPPC) -c $(CPPFLAGS) $(INC_DIR)/stlheaders.hh -o $(INC_DIR)/stlheaders.hh.gch
+
+all: doc tags stat srcs exes
+bin: srcs exes
+
+timings: clobber
+	echo -n "doc: "; time make -j3 doc &> /dev/null
+	echo -n "tags: "; time make -j3 tags &> /dev/null
+	echo -n "stat"; time make -j3 stat &> /dev/null
+	echo -n "fesrcs"; time make -j3 fesrcs &> /dev/null
+	echo -n "besrcs"; time make -j3 besrcs &> /dev/null
+	echo -n "exes"; time make -j3 exes &> /dev/null
+	echo -n "pch"; time make -j3 pch &> /dev/null
+	echo -n "clobber"; time make -j3 clobber &> /dev/null
+	echo -n "all"; time make -j3 all &> /dev/null
+
+exes: updatebuildcnt bcc
+
+$(FELIB): $(FEOBJECTS)
+	cd $(OBJ_DIR); $(AR) $(ARFLAGS) $@ $^
+
+bcc: $(FELIB) $(BEOBJECTS)
+	@echo -n "Updating the build count: ";\
+	cd $(INC_DIR); $(TOOLS_DIR)/updatebuildcnt;\
+	cat $(INC_DIR)/buildcount.h
+	@echo "Generating the executable $@";\
+	rm -rf $@;\
+	cd $(OBJ_DIR); $(CPPC) $^ -o $(EXE_DIR)/$@
+
+clobber: clean
+	@rm -rf $(EXE_DIR)/bcc
+	@rm -rf $(TOOLS_DIR)/updatebuildcnt
+	@rm -rf $(INC_DIR)/stlheaders.hh.gch
+	@echo "clobber finished."
+
+clean:
+	@rm -rf $(EXE_DIR)/bcc
+	@rm -rf $(OBJ_DIR)/*.o
+	@rm -rf $(OBJ_DIR)/*.a
+	@rm -rf $(OBJ_DIR)/*.d
+	@echo "clean finished."
+
+cleanfe:
+	@cd $(OBJ_DIR); rm -rf $(FELIB) $(FEOBJECTS)
+
+srcs: fesrcs besrcs
+
+updatebuildcnt: updatebuildcnt.o
+	g++ $(OBJ_DIR)/updatebuildcnt.o -o $(TOOLS_DIR)/updatebuildcnt
+
+fesrcs: $(FELIB) $(FEOBJECTS)
+	@echo "FE Source build finished."
+
+rm-besrcs:
+	@rm -rf $(BEOBJECTS:%.o=$(OBJ_DIR)/%.o) $(BEOBJECTS:%.o=$(OBJ_DIR)/%.d)
+	@rm -rf $(INC_DIR)/$(PCHS)
+
+besrcs: $(PCHS) $(BEOBJECTS)
+	@echo "BE Source build finished."
+
+doc:
+	@echo "Generating Documentation:";\
+	cd ..; doxygen cf.doxygen.conf > /dev/null;\
+	echo "Documentation generated"
+
+tags:
+	@rm -rf ../all.tags;\
+	echo -n "Generating tags:";\
+	ctags -R -o ../all.tags ~/mydev/cf ~/mydev/lcc;\
+	echo "Tags generated"
+
+stat:
+	@echo "Statistics #lines:";\
+	find .. -name "*pp" -exec echo -n " " {} \; | xargs wc -l | sort -n;\
+	echo "Statistics done"
+
+-include $(BEOBJECTS:%.o=$(OBJ_DIR)/%.d)
+-include $(FEOBJECTS:%.o=$(OBJ_DIR)/%.d)
+
+

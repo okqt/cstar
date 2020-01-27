@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="361"
+   name=""
+   committed-date="2007-04-16T12:49:55.155134Z"
+   url="file:///svn/codename_cf/trunk/src/targets/arm"
+   last-author="onder"
+   kind="dir"
+   uuid="6301a474-e773-44ff-9130-04379f8ba353"
+   repos="file:///svn/codename_cf"
+   revision="361"/>
+<entry
+   committed-rev="361"
+   name="arm_hwdef.hpp"
+   text-time="2007-04-19T14:50:04.000000Z"
+   committed-date="2007-04-16T12:49:55.155134Z"
+   checksum="a16bb6bb576eb7116c030d849678dff4"
+   last-author="onder"
+   kind="file"
+   prop-time="2007-04-19T14:50:04.000000Z"/>
+<entry
+   committed-rev="361"
+   name="arm_hwdef.cpp"
+   text-time="2007-04-19T14:50:04.000000Z"
+   committed-date="2007-04-16T12:49:55.155134Z"
+   checksum="801a1cd40765ac4222a52cc33d4c4e34"
+   last-author="onder"
+   kind="file"
+   prop-time="2007-04-19T14:50:04.000000Z"/>
+</wc-entries>

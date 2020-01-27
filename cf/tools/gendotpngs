@@ -1,0 +1,11 @@
+#!/bin/bash
+echo -n "Number of dot files: "
+echo `ls /tmp/*.dot | wc`
+for i in /tmp/*.dot
+do
+  echo "Processing $i"
+  dot -Tpng $i -o $i.png
+  rm -rf $i
+done
+
+rm -rf /tmp/*.dot

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="15"
+   name=""
+   committed-date="2006-06-29T10:26:43.072009Z"
+   url="file:///svn/codename_cf/trunk/docs/doxygen"
+   last-author="onder"
+   kind="dir"
+   uuid="6301a474-e773-44ff-9130-04379f8ba353"
+   repos="file:///svn/codename_cf"
+   prop-time="2007-04-19T14:50:04.000000Z"
+   revision="361"/>
+<entry
+   committed-rev="15"
+   name=".cvsignore"
+   text-time="2007-04-19T14:50:04.000000Z"
+   committed-date="2006-06-29T10:26:43.072009Z"
+   checksum="32d29a4b66c45c95c7b245b14973412a"
+   last-author="onder"
+   kind="file"
+   prop-time="2007-04-19T14:50:04.000000Z"/>
+</wc-entries>

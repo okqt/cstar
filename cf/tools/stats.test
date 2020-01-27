@@ -1,0 +1,70 @@
+#!/bin/bash
+
+# introduce the dummmy known fails to make the ls happy.
+echo -n "" > known.compfail
+echo -n "" > known.fail
+echo -n "" > known.asmfail
+echo -n "" > known.rtcrashfail
+echo -n "" > known.cnt
+echo -n "" > known.pass
+
+echo -n "" > ref/known.compfail.ref
+echo -n "" > ref/known.fail.ref
+echo -n "" > ref/known.asmfail.ref
+echo -n "" > ref/known.rtcrashfail.ref
+echo -n "" > ref/known.pass.ref
+
+tests=`ls -1 *.cnt | wc -l`
+tests=$(($tests-1))
+pass=`ls -1 *.pass | wc -l`
+pass=$(($pass-1))
+fail=`ls -1 *.fail | wc -l`
+fail=$(($fail-1))
+compfail=`ls -1 *.compfail | wc -l`
+compfail=$(($compfail-1))
+asmfail=`ls -1 *.asmfail | wc -l`
+asmfail=$(($asmfail-1))
+rtcrashfail=`ls -1 *.rtcrashfail | wc -l`
+rtcrashfail=$(($rtcrashfail-1))
+
+refpass=`ls -1 ref/*.pass.ref | wc -l`
+refpass=$(($refpass-1))
+reffail=`ls -1 ref/*.fail.ref | wc -l`
+reffail=$(($reffail-1))
+refcompfail=`ls -1 ref/*.compfail.ref | wc -l`
+refcompfail=$(($refcompfail-1))
+refasmfail=`ls -1 ref/*.asmfail.ref | wc -l`
+refasmfail=$(($refasmfail-1))
+refrtcrashfail=`ls -1 ref/*.rtcrashfail.ref | wc -l`
+refrtcrashfail=$(($refrtcrashfail-1))
+
+refpass=$(($pass-$refpass))
+reffail=$(($fail-$reffail))
+refcompfail=$(($compfail-$refcompfail))
+refasmfail=$(($asmfail-$refasmfail))
+refrtcrashfail=$(($rtcrashfail-$refrtcrashfail))
+
+if [ $tests != 0 ] ; then
+  passper=$(($pass*100/$tests))
+  failper=$(($fail*100/$tests))
+  asmfailper=$(($asmfail*100/$tests))
+  rtcrashfailper=$(($rtcrashfail*100/$tests))
+  compfailper=$(($compfail*100/$tests))
+  pf=$(($pass+$fail))
+  pfper=$((($pass+$fail)*100/$tests))
+else
+  passper=0
+  failper=0
+  asmfailper=0
+  rtcrashfailper=0
+  compfailper=0
+  pf=0
+  pfper=0
+fi
+
+echo " "
+echo -n "#=$tests, pass=$pass($passper%)$refpass fail=$fail($failper%)$reffail "
+echo -n "CompFail=$compfail($compfailper%)$refcompfail AsmFail=$asmfail($asmfailper%)$refasmfail "
+echo "RunCrash=$rtcrashfail($rtcrashfailper%)$refrtcrashfail pf=$pf($pfper%)"
+
+

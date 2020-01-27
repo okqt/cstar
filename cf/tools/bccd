@@ -1,0 +1,68 @@
+#!/bin/bash
+
+ulimit -t 60
+ulimit -v 400000
+
+inputfile=$1
+inputbasename=`basename $inputfile .c`
+basesuffix="_i"
+basename="$inputbasename$basesuffix"
+asmname="$basename.c.s"
+rm -rf $asmname $inputbasename.log $inputbasename.out $basename.bccout $inputbasename.*fai* $inputbasename.pass
+echo " " > $inputbasename.cnt
+dirname=`dirname $1`
+
+cpp -U__GNUC__ -ansi -Isystem -I/home/onder/Desktop/extrdownloads/armgnutools/xscale-elf/include -I. -I.. -D__LCC__=1  -D"__attribute__(X)=" -D"__extension__=" -D"__const=" -D"__restrict=" -D"__builtin_va_list=void*" -D"__flexarr=*" -E $inputfile > $basename.c
+
+./bcc -target=bcc/linux -I/home/onder/Desktop/extrdownloads/armgnutools/xscale-elf/include -I/home/onder/mydev/tests/perC/6_5_perC $basename.c &> $basename.bccout
+
+if [ -e $basename.c.s ]; then
+  #bcc -m --gcc -I/home/onder/Desktop/extrdownloads/armgnutools/xscale-elf/include -I/home/onder/mydev/tests/perC/6_5_perC $@ &> $basename.bccout
+  xscale-elf-gcc flatdir/fltcmps.c scaffold.c $asmname -o $inputbasename.out /home/onder/Desktop/extrdownloads/armgnutools/xscale-elf/lib/libm.a &> $basename.asmout 
+  if [ -e $inputbasename.out ]; then
+    xscale-elf-run ./$inputbasename.out &> /dev/null
+  fi
+fi
+
+function dispresult () {
+  if [ -e ref/$inputbasename.$1.ref ]; then
+    echo -n "$2";
+  else
+    echo -n "$3";
+  fi
+}
+
+if [ ! -e $basename.c.s ]; then
+  echo "" > $inputbasename.compfail 
+  dispresult compfail c C
+  rm $basename.c.stats
+else
+  if [ ! -e $inputbasename.out ]; then
+    echo "" > $inputbasename.asmfail
+    dispresult asmfail a A
+    rm $basename.c.stats
+  else
+    if [ ! -e $inputbasename.log ]; then
+      echo "" > $inputbasename.rtcrashfail
+      dispresult rtcrashfail r R
+      rm $basename.c.stats
+    else
+      pass=`grep -ls Passed $inputbasename.log | wc -l`
+      if [ $pass == 1 ]; then
+        echo "" > $inputbasename.pass
+        dispresult pass "." P
+        # delete unnecessary files
+        rm $inputbasename.log $inputbasename.out $basename.c $basename.c.s $basename.asmout $basename.bccout
+      else
+        fail=`grep -ls FAILED $inputbasename.log | wc -l`
+        if [ $fail == 1 ]; then
+          echo "" > $inputbasename.fail
+          dispresult fail f F
+          rm $basename.c.stats
+        fi
+      fi
+    fi
+  fi
+fi
+
+

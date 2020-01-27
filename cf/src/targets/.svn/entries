@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="361"
+   name=""
+   committed-date="2007-04-16T12:49:55.155134Z"
+   url="file:///svn/codename_cf/trunk/src/targets"
+   last-author="onder"
+   kind="dir"
+   uuid="6301a474-e773-44ff-9130-04379f8ba353"
+   repos="file:///svn/codename_cf"
+   revision="361"/>
+<entry
+   name="arm"
+   kind="dir"/>
+</wc-entries>
